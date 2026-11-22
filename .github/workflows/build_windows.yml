@@ -1,0 +1,36 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Enable Windows Desktop & Create Missing Runner Files
+        run: |
+          flutter config --enable-windows-desktop
+          flutter create --platforms=windows .
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows Release EXE
+        run: flutter build windows --release
+
+      - name: Upload Windows EXE Build as ZIP Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Persian-Calendar-Windows-EXE
+          path: build/windows/x64/runner/Release/
